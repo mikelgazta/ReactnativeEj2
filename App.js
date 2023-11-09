@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  FlatList,
-  TextInput,
-} from "react-native";
-
+import { View, Text, StyleSheet, StatusBar, FlatList, TextInput, TouchableOpacity } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import CoinItem from "./components/CoinItem";
+import CoinDetails from "./components/CoinDetails";
+
+const Stack = createStackNavigator();
 
 const App = () => {
   const [coins, setCoins] = useState([]);
@@ -16,9 +13,7 @@ const App = () => {
   const [search, setSearch] = useState("");
 
   const loadData = async () => {
-    const res = await fetch(
-      "https://api.binance.com/api/v3/ticker/24hr"
-    );
+    const res = await fetch("https://api.binance.com/api/v3/ticker/24hr");
     const data = await res.json();
     setCoins(data);
   };
@@ -28,36 +23,56 @@ const App = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor="#141414" />
-
-      <View style={styles.header}>
-        <Text style={styles.title}>CryptoMarket</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search a Coin"
-          placeholderTextColor="#858585"
-          onChangeText={(text) => text && setSearch(text)}
-        />
-      </View>
-
-      <FlatList
-        style={styles.list}
-        data={coins.filter(
-          (coin) =>
-            coin.symbol.toLocaleLowerCase().includes("usdt")&&
-            coin.symbol.toLowerCase().includes(search.toLocaleLowerCase())
-        )}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => <CoinItem coin={item} />}
-        refreshing={refreshing}
-        onRefresh={async () => {
-          setRefreshing(true);
-          await loadData();
-          setRefreshing(false);
-        }}
-      />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="CryptoList"
+          options={{ title: "CryptoMarket" }}
+        >
+          {({ navigation }) => (
+            <View style={styles.container}>
+              <StatusBar backgroundColor="#141414" />
+              <View style={styles.header}>
+                <Text style={styles.title}>CryptoMarket</Text>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search a Coin"
+                  placeholderTextColor="#858585"
+                  onChangeText={(text) => text && setSearch(text)}
+                />
+              </View>
+              <FlatList
+                style={styles.list}
+                data={coins.filter(
+                  (coin) =>
+                    coin.symbol.toLowerCase().includes("usdt") &&
+                    coin.symbol.toLowerCase().includes(search.toLocaleLowerCase())
+                )}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate("CoinDetails", {
+                        coin: item, // Pasa el objeto 'item' como parámetro
+                      })
+                    }
+                  >
+                    <CoinItem coin={item} />
+                  </TouchableOpacity>
+                )}
+                refreshing={refreshing}
+                onRefresh={async () => {
+                  setRefreshing(true);
+                  await loadData();
+                  setRefreshing(false);
+                }}
+              />
+            </View>
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="CoinDetails" component={CoinDetails} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 

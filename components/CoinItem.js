@@ -1,34 +1,46 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-const CoinItem = ({ coin }) => (
-  <View style={styles.containerItem}>
-    <View style={styles.coinName}>
-    <View style={styles.containerNames}>
-        <Text style={styles.text}>{coin.symbol.replace("USDT","")}</Text>
-        <Text style={styles.textSymbol}>{coin.symbol}</Text>
+const CoinItem = ({ coin }) => {
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    // Navegar a la pantalla de detalles con los detalles de la criptomoneda
+    navigation.navigate("CoinDetails", { coin });
+  };
+
+  return (
+    <TouchableOpacity onPress={handlePress}>
+      <View style={styles.containerItem}>
+        <View style={styles.coinName}>
+          <View style={styles.containerNames}>
+            <Text style={styles.text}>{coin.symbol.replace("USDT", "")}</Text>
+            <Text style={styles.textSymbol}>{coin.symbol}</Text>
+          </View>
+        </View>
+        <View>
+          <Text style={styles.textPrice}>
+            ${parseFloat(coin.lastPrice).toFixed(2)}
+          </Text>
+          <Text
+            style={[
+              styles.pricePercentage,
+              typeof coin.priceChangePercent === "string" &&
+              parseFloat(coin.priceChangePercent) > 0
+                ? styles.priceUp
+                : styles.priceDown,
+            ]}
+          >
+            {typeof coin.priceChangePercent === "string"
+              ? parseFloat(coin.priceChangePercent).toFixed(2) + "%"
+              : "N/A"}
+          </Text>
+        </View>
       </View>
-    </View>
-    <View>
-      <Text style={styles.textPrice}>
-        ${parseFloat(coin.lastPrice).toFixed(2)}
-      </Text>
-      <Text
-        style={[
-          styles.pricePercentage,
-          typeof coin.priceChangePercent === "string" &&
-          parseFloat(coin.priceChangePercent) > 0
-            ? styles.priceUp
-            : styles.priceDown,
-        ]}
-      >
-        {typeof coin.priceChangePercent === "string"
-          ? parseFloat(coin.priceChangePercent).toFixed(2) + "%"
-          : "N/A"}
-      </Text>
-    </View>
-  </View>
-);
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   containerItem: {
