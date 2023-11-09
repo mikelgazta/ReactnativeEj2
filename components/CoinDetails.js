@@ -46,7 +46,6 @@ const styles = StyleSheet.create({
   detailItem: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 8,
     padding: 5,
     borderWidth: 1,
     borderColor: "white",
