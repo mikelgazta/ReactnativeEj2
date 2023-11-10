@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { LineChart } from "react-native-chart-kit";
 
 const CoinDetails = ({ route }) => {
   const { coin } = route.params; // Obtiene el objeto 'coin' de los parámetros de navegación
@@ -28,6 +29,32 @@ const CoinDetails = ({ route }) => {
           ? parseFloat(coin.priceChangePercent).toFixed(2) + "%"
           : "N/A"}
       </Text>
+      <View style={styles.chartContainer}>
+        <LineChart
+          data={{
+            labels: ["Open", "Close", "High", "Low"],
+            datasets: [
+              {
+                data: [
+                  parseFloat(coin.openPrice),
+                  parseFloat(coin.lastPrice),
+                  parseFloat(coin.highPrice),
+                  parseFloat(coin.lowPrice),
+                ],
+              },
+            ],
+          }}
+          width={350}
+          height={220}
+          chartConfig={{
+            backgroundGradientFrom: "#1E2923",
+            backgroundGradientTo: "#08130D",
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          }}
+          bezier
+          withDots={false} // Oculta los puntos en el gráfico si lo deseas
+        />
+      </View>
     </View>
   );
 };
@@ -35,6 +62,7 @@ const CoinDetails = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#141414",
+    flex: 1,
     padding: 16,
   },
   title: {
@@ -65,15 +93,9 @@ const styles = StyleSheet.create({
   priceDown: {
     color: "#fc4422",
   },
-  button: {
-    backgroundColor: "#4657CE",
+  chartContainer: {
     alignItems: "center",
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  buttonText: {
-    color: "#fff",
+    marginTop: 20, 
   },
 });
 
